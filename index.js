@@ -6,6 +6,8 @@
  * @created 2015/10/29
  */
 "use strict";
+process.env['PATH'] = '/var/task/lib/imagemagick/bin/:' + process.env['PATH'];
+process.env['LD_LIBRARY_PATH'] = '/var/task/lib/imagemagick/lib/';
 
 const ImageProcessor = require("./lib/ImageProcessor");
 const S3FileSystem   = require("./lib/S3FileSystem");
@@ -16,10 +18,9 @@ const path           = require("path");
 
 // Lambda Handler
 exports.handler = (event, context, callback) => {
-
     var eventRecord = eventParser(event);
     if (eventRecord) {
-        process(eventRecord, callback);
+        processObject(eventRecord, callback);
     } else {
         console.log(JSON.stringify(event));
         callback('Unsupported or invalid event');
@@ -27,7 +28,7 @@ exports.handler = (event, context, callback) => {
     }
 };
 
-function process(s3Object, callback) {
+function processObject(s3Object, callback) {
     const configPath = path.resolve(__dirname, "config.json");
     const fileSystem = new S3FileSystem();
     const processor  = new ImageProcessor(fileSystem, s3Object);
